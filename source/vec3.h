@@ -1,8 +1,7 @@
 #ifndef VEC3H
 #define VEC3H
 
-#include <cmath>
-#include <iostream>
+#include "common.h"
 
 class vec3 {
 public:

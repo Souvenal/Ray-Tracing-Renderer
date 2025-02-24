@@ -1,2 +1,2 @@
 all:
-	g++ -Wall -g -o ../render main.cpp
+	g++ -std=c++20 -Wall -g -o ../render main.cpp
