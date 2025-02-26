@@ -1,4 +1,4 @@
 all:
 	cd source && make && cd ..
-	./render > graph.ppm
+	time  ./render > graph.ppm 5000
 	code graph.ppm
