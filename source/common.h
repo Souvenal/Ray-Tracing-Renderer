@@ -1,8 +1,5 @@
-#ifndef COMMENH
-#define COMMENH
+#pragma once
 
 #include <cmath>
 #include <iostream>
 #include <memory>
-
-#endif

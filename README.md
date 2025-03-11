@@ -3,7 +3,7 @@ This is a tiny renderer based on three famous books.
 We use .ppm, a pixel map format to generate images.
 
 ## Ray Tracing in One Weekend
-Basic classes:
+### Basic classes:
 1. vec3: a simple way to express colors, locations and directions
 2. ray: shooting from one point to another
 3. camera: a positionable camera, allowing one to change its focus
@@ -15,14 +15,15 @@ Basic classes:
     - metal: light obeys standard reflection
     - dielectric: light is allowed to refract
 
-Features:
+### Features:
 1. support calculating the process when light hits a hitbale object
 2. antialising: by rasing sample rate ro denoise
 3. support three ways to deal with light by changing the material of a hitable
 4. defoucus blur: by changing the depth of field
 
 ## Ray Tracing: The Next Weekend
-
+### Features
+1. motion blur
 
 ## Ray Tracing: The Rest of Your Life
 
