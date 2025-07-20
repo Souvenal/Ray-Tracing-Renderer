@@ -16,28 +16,29 @@ RENDER_4K = $(RENDER_COMMAND_PREFIX) graph_4k.ppm -x 4096 -y 3112 --sample-rate 
 # test 清晰度渲染任务
 test:
 	@$(COMPILE_COMMAND)
-	@time $(RENDER_TEST)
+	@time $(_TEST)
 	@code graph_test.ppm
 
 # 中等清晰度渲染任务
-medium:
+medium: 
 	@$(COMPILE_COMMAND)
-	@time $(RENDER_MEDIUM)
+	@time $(_MEDIUM)
 	@code graph_medium.ppm
 
 # 2K 清晰度渲染任务
-2k:
+2k: 
 	@$(COMPILE_COMMAND)
-	@time $(RENDER_2K)
+	@time $(_2K)
 	@code graph_2k.ppm
 
 # 4K 清晰度渲染任务
-4k:
+4k: 
 	@$(COMPILE_COMMAND)
-	@time $(RENDER_4K)
+	@time $(_4K)
 	@code graph_4k.ppm
 
 # 清理生成的文件
-clean:
+clean: 
 	@rm -f graph_test.ppm graph_medium.ppm graph_2k.ppm graph_4k.ppm
 	@cd $(SOURCE_DIR) && make clean && cd ..
+	@rm -f render

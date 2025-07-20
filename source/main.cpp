@@ -4,23 +4,28 @@
 #include "float.h"
 #include "camera.h"
 #include "scenario.h"
+#include "omp.h"
 
 const vec3 color(const ray& r, hitable *world, int depth, int maxDepth) {
     hit_record rec;
     if (world->hit(r, 0.001, MAXFLOAT, rec)) {
         ray scattered;
         vec3 attenuation;
+        vec3 emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
         if (depth < maxDepth && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
-            return attenuation*color(scattered, world, depth+1, maxDepth);
+            return emitted + attenuation*color(scattered, world, depth+1, maxDepth);
         }
         else {
-            return vec3(0,0,0);
+            return emitted;
         }
     }
+    // else {
+    //     vec3 unit_direction = unit_vector(r.direction());
+    //     float t = 0.5*(unit_direction.y() + 1.0);
+    //     return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+    // }
     else {
-        vec3 unit_direction = unit_vector(r.direction());
-        float t = 0.5*(unit_direction.y() + 1.0);
-        return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+        return vec3(0, 0, 0); // Return black if no hit
     }
 }
 
@@ -103,16 +108,27 @@ int main(int argc, char* argv[]) {
 
     // hitable *world = random_scene();
     // hitable *world = two_spheres();
-    hitable *world = two_perlin_spheres();
+    // hitable *world = two_perlin_spheres();
+    // hitable *world = simple_light();
+    hitable *world = cornell_box();
 
-    vec3 lookfrom(13, 2, 3);
-    vec3 lookat(0, 0, 0);
+    // vec3 lookfrom(13, 2, 3);
+    // vec3 lookat(0, 0, 0);
+    // vec3 vup(0, 1, 0);
+    // float vfov = 20.0;
+    // float dist_to_focus = 10.0; 
+    // float aperture = 0.0;
+    vec3 lookfrom(278, 278, -800);
+    vec3 lookat(278,278,0);
+    float dist_to_focus = 10.0;
+    float aperture = 0.0;
+    float vfov = 40.0;
     vec3 vup(0, 1, 0);
     float aspect = float(nx) / float(ny);
-    float dist_to_focus = 10.0; 
-    float aperture = 0.0;
 
-    camera cam(lookfrom, lookat, vup, 20, aspect, aperture, dist_to_focus, 0.0, 1.0);
+    camera cam(lookfrom, lookat, vup, vfov, aspect, aperture, dist_to_focus, 0.0, 1.0);
+    // std::cout << "Using " << omp_get_max_threads() << " threads." << std::endl;
+    // #pragma omp parallel for schedule(dynamic)
     for (int j = ny-1; j >= 0; j--) {
         for (int i = 0; i < nx; i++) {
             vec3 col(0, 0, 0);
@@ -128,6 +144,9 @@ int main(int argc, char* argv[]) {
             int ir = int(255.99*col[0]);
             int ig = int(255.99*col[1]);
             int ib = int(255.99*col[2]);
+
+            // #pragma omp critical
+            // {
             ppmFile << ir << " " << ig << " " << ib << "\n";
 
             // 计算进度百分比
@@ -153,6 +172,7 @@ int main(int argc, char* argv[]) {
             std::cout << "Elapsed: " << elapsedTime << "s ";
             std::cout << "Remaining: " << remainingTime << "s\r";
             std::cout.flush();
+        // }
         }
     }
 }

@@ -7,3 +7,5 @@
 hitable* two_spheres();
 hitable* two_perlin_spheres();
 hitable* random_scene();
+hitable *simple_light();
+hitable *cornell_box();
