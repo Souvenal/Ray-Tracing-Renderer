@@ -23,6 +23,7 @@ bool moving_sphere::hit(const ray &r, float t_min, float t_max,
             rec.p = r.point_at_parameter(rec.t);
             rec.normal = (rec.p - center(r.time())) / radius;
             rec.mat_ptr = mat_ptr;
+            get_sphere_uv((rec.p - center(r.time())) / radius, rec.u, rec.v);
             return true;
         }
         temp = (-b + sqrt(discriminant)) / a;
