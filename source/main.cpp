@@ -110,7 +110,9 @@ int main(int argc, char* argv[]) {
     // hitable *world = two_spheres();
     // hitable *world = two_perlin_spheres();
     // hitable *world = simple_light();
-    hitable *world = cornell_box();
+    // hitable *world = cornell_box();
+    // hitable *world = cornell_smoke();
+    hitable *world = final();
 
     // vec3 lookfrom(13, 2, 3);
     // vec3 lookat(0, 0, 0);

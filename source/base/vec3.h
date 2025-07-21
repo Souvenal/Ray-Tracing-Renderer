@@ -1,8 +1,7 @@
 #pragma once
 
-#include <iostream>
 #include <cmath>
-#include <cstdlib>
+#include <iostream>
 
 class vec3 {
 public:
