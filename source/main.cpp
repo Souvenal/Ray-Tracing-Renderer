@@ -6,27 +6,22 @@
 #include "scenario.h"
 #include "omp.h"
 
-const vec3 color(const ray& r, hitable *world, int depth, int maxDepth) {
+const vec3 color(const ray& r, hitable *world, int depth) {
     hit_record rec;
     if (world->hit(r, 0.001, MAXFLOAT, rec)) {
         ray scattered;
         vec3 attenuation;
         vec3 emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
-        if (depth < maxDepth && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
-            return emitted + attenuation*color(scattered, world, depth+1, maxDepth);
+        float pdf;
+        vec3 albedo;
+        if (depth < 50 && rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf)) {
+            return emitted + albedo*rec.mat_ptr->scattering_pdf(r, rec, scattered)*color(scattered, world, depth+1) / pdf;
         }
-        else {
+        else
             return emitted;
-        }
     }
-    // else {
-    //     vec3 unit_direction = unit_vector(r.direction());
-    //     float t = 0.5*(unit_direction.y() + 1.0);
-    //     return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
-    // }
-    else {
-        return vec3(0, 0, 0); // Return black if no hit
-    }
+    else
+        return vec3(0,0,0);
 }
 
 
@@ -106,29 +101,11 @@ int main(int argc, char* argv[]) {
     // 开始时间，用于计算剩余时间
     std::clock_t startTime = std::clock();
 
-    // hitable *world = random_scene();
-    // hitable *world = two_spheres();
-    // hitable *world = two_perlin_spheres();
-    // hitable *world = simple_light();
-    // hitable *world = cornell_box();
-    // hitable *world = cornell_smoke();
-    hitable *world = final();
+    // 创建场景
+    hitable *world = nullptr;
+    camera *cam = nullptr;
+    cornell_box(&world, &cam, float(nx) / float(ny));
 
-    // vec3 lookfrom(13, 2, 3);
-    // vec3 lookat(0, 0, 0);
-    // vec3 vup(0, 1, 0);
-    // float vfov = 20.0;
-    // float dist_to_focus = 10.0; 
-    // float aperture = 0.0;
-    vec3 lookfrom(278, 278, -800);
-    vec3 lookat(278,278,0);
-    float dist_to_focus = 10.0;
-    float aperture = 0.0;
-    float vfov = 40.0;
-    vec3 vup(0, 1, 0);
-    float aspect = float(nx) / float(ny);
-
-    camera cam(lookfrom, lookat, vup, vfov, aspect, aperture, dist_to_focus, 0.0, 1.0);
     // std::cout << "Using " << omp_get_max_threads() << " threads." << std::endl;
     // #pragma omp parallel for schedule(dynamic)
     for (int j = ny-1; j >= 0; j--) {
@@ -137,9 +114,9 @@ int main(int argc, char* argv[]) {
             for (int s=0; s < ns; s++) {
                 float u = float(i + drand48()) / float(nx);
                 float v = float(j + drand48()) / float(ny);
-                ray r = cam.get_ray(u, v);
+                ray r = cam->get_ray(u, v);
                 // vec3 p = r.point_at_parameter(2.0);
-                col += color(r, world, 0, maxDepth);
+                col += color(r, world, 0);
             }
             col /= float(ns);
             col = vec3( sqrt(col[0]), sqrt(col[1]), sqrt(col[2]) );

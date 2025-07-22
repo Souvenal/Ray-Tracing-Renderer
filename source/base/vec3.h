@@ -1,7 +1,8 @@
 #pragma once
 
-#include <cmath>
+// #include <cmath>
 #include <iostream>
+#include <numbers>
 
 class vec3 {
 public:
@@ -150,6 +151,14 @@ inline vec3 random_in_unit_sphere() {
     return p;
 }
 
+inline vec3 random_on_unit_sphere() {
+    vec3 p;
+    do {
+        p = 2.0*vec3(drand48(), drand48(), drand48()) - vec3(1, 1, 1);
+    } while (p.squared_length() >= 1.0);
+    return unit_vector(p);
+}
+
 inline vec3 reflect(const vec3& v, const vec3& n) {
     return v - 2 * dot(v, n) * n;
 }
@@ -162,3 +171,13 @@ float schlick(float cosine, float ref_idx);
  * @param p should be on unit sphere
  */
 void get_sphere_uv(const vec3& p, float& u, float& v);
+
+inline vec3 random_cosine_direction() {
+    float r1 = drand48();
+    float r2 = drand48();
+    float z = sqrt(1 - r2);
+    float phi = 2 * std::numbers::pi_v<float> * r1;
+    float x = cos(phi) * 2 * sqrt(r2);
+    float y = sin(phi) * 2 * sqrt(r2);
+    return vec3(x, y, z);
+}
