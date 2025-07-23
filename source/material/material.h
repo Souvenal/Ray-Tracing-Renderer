@@ -6,7 +6,7 @@
 
 class material  {
 public:
-    virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& albedo, ray& scattered, float& pdf) const {
+    virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& alb, ray& scattered, float& pdf) const {
         return false;
     }
     virtual float scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const {

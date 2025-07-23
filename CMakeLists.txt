@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 4.0)
 project(Ray-Tracing-Renderer VERSION 1.0)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 
 add_compile_options(-O3 -Wall)
 

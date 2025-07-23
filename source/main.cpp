@@ -1,4 +1,7 @@
-#include <iostream>
+// #include <iostream>
+#include <print>
+#include <vector>
+#include <tuple>
 #include <fstream>
 #include <getopt.h>
 #include "float.h"
@@ -106,8 +109,10 @@ int main(int argc, char* argv[]) {
     camera *cam = nullptr;
     cornell_box(&world, &cam, float(nx) / float(ny));
 
-    // std::cout << "Using " << omp_get_max_threads() << " threads." << std::endl;
-    // #pragma omp parallel for schedule(dynamic)
+    std::vector<std::vector<std::tuple<int, int, int>>> pixelBuffer(ny, std::vector<std::tuple<int, int, int>>(nx));
+
+    // std::print("Using {} threads.\n", omp_get_max_threads());
+    #pragma omp parallel for schedule(dynamic)
     for (int j = ny-1; j >= 0; j--) {
         for (int i = 0; i < nx; i++) {
             vec3 col(0, 0, 0);
@@ -124,9 +129,14 @@ int main(int argc, char* argv[]) {
             int ig = int(255.99*col[1]);
             int ib = int(255.99*col[2]);
 
-            // #pragma omp critical
-            // {
-            ppmFile << ir << " " << ig << " " << ib << "\n";
+            // 存储到缓冲区
+            std::get<0>(pixelBuffer[j][i]) = ir;
+            std::get<1>(pixelBuffer[j][i]) = ig;
+            std::get<2>(pixelBuffer[j][i]) = ib;
+
+            #pragma omp critical
+            {
+            // ppmFile << ir << " " << ig << " " << ib << "\n";
 
             // 计算进度百分比
             float progress = static_cast<float>(++completedPixels) / totalPixels;
@@ -151,7 +161,16 @@ int main(int argc, char* argv[]) {
             std::cout << "Elapsed: " << elapsedTime << "s ";
             std::cout << "Remaining: " << remainingTime << "s\r";
             std::cout.flush();
-        // }
+        }
+        }
+    }
+
+    // 写入PPM文件（按正确顺序：从上到下）
+    for (int j = ny - 1; j >= 0; j--) {
+        for (int i = 0; i < nx; i++) {
+            ppmFile << std::get<0>(pixelBuffer[j][i]) << " " 
+                    << std::get<1>(pixelBuffer[j][i]) << " " 
+                    << std::get<2>(pixelBuffer[j][i]) << "\n";
         }
     }
 }
